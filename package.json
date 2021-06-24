@@ -1,5 +1,5 @@
 {
-	"name": "npm.packageview",
+	"name": "npm-package-view",
 	"displayName": "view npm package",
 	"description": "view npm package",
 	"version": "0.0.1",
@@ -7,6 +7,7 @@
 		"type": "git",
 		"url": "https://github.com/MaLuns/vscode-extension-view-npm-package"
 	},
+	"publisher": "mal",
 	"author": {
 		"name": "白云苍狗"
 	},
@@ -16,6 +17,7 @@
 	"categories": [
 		"Other"
 	],
+	"icon": "icons/icon128x128.png",
 	"activationEvents": [
 		"*"
 	],
@@ -34,6 +36,16 @@
 			}
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "npm.packageview.search",
+					"when": "false"
+				},
+				{
+					"command": "npm.packageview.selectVersion",
+					"when": "false"
+				}
+			],
 			"view/title": [
 				{
 					"command": "npm.packageview.search",

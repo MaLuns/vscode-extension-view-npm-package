@@ -1,12 +1,13 @@
 
 import * as vscode from 'vscode';
 import { search } from './search';
-import { view, viewfile } from './view';
+import { view, viewfile, selectVersion } from './view';
 
 const commands = {
     search,
     view,
-    viewfile
+    viewfile,
+    selectVersion
 };
 
 export const registered = Object.keys(commands).map((commandName) => {

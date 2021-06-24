@@ -8,15 +8,16 @@ let packageFilesTree: vscode.TreeView<NpmSearchTreeItem>;
  * 
  * @param keyword 
  */
-export const view = async (keyword: string) => {
+export const view = async (keyword: string, version: string) => {
     if (keyword) {
         if (packageTree) {
-            packageTree.refresh(keyword);
+            packageTree.refresh(keyword, version);
         } else {
-            packageTree = new PackageTree(keyword);
+            packageTree = new PackageTree(keyword, version);
             packageFilesTree = vscode.window.createTreeView('views.npm.package.list', { treeDataProvider: packageTree });
         }
-        packageFilesTree.description = keyword;
+        packageFilesTree.title = keyword;
+        packageFilesTree.description = '@' + version;
     }
 };
 
@@ -35,5 +36,13 @@ export const viewfile = async (url: string) => {
 
 
 export const selectVersion = () => {
-
+    if (packageTree && !packageTree.isLoading && packageTree.versionList.length > 0) {
+        vscode.window.showQuickPick(packageTree.versionList, {
+            title: 'switch versions',
+            placeHolder: 'search package versions'
+        }).then(res => {
+            packageTree.refresh(packageTree.keyword, res);
+            packageFilesTree.description = '@' + res;
+        });
+    }
 };

@@ -7,7 +7,8 @@ const view_1 = require("./view");
 const commands = {
     search: search_1.search,
     view: view_1.view,
-    viewfile: view_1.viewfile
+    viewfile: view_1.viewfile,
+    selectVersion: view_1.selectVersion
 };
 exports.registered = Object.keys(commands).map((commandName) => {
     const callCommand = (...arg) => commands[commandName](...arg);

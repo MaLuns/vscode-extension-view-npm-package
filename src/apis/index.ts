@@ -13,11 +13,15 @@ export const searchNpmPackage = async (keyword: string): Promise<SearchNpmPackag
     return JSON.parse(res).objects.map((item: { package: any }) => item.package);
 };
 
-export const getPakageDirectory = async (keyword: string): Promise<PakageDirectoryModel[]> => {
+export const getPackageDirectory = async (keyword: string): Promise<PakageDirectoryModel[]> => {
     const res = await httpsGet({ url: jsdelivrUrl + keyword });
     return JSON.parse(res).files;
 };
 
+export const getPackageVersions = async (keyword: string): Promise<string[]> => {
+    const res = await httpsGet({ url: jsdelivrUrl + keyword });
+    return JSON.parse(res).versions;
+};
 
 export interface SearchNpmPackageModel {
     name: string,

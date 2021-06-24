@@ -18,16 +18,17 @@ let packageFilesTree;
  *
  * @param keyword
  */
-const view = (keyword) => __awaiter(void 0, void 0, void 0, function* () {
+const view = (keyword, version) => __awaiter(void 0, void 0, void 0, function* () {
     if (keyword) {
         if (packageTree) {
-            packageTree.refresh(keyword);
+            packageTree.refresh(keyword, version);
         }
         else {
-            packageTree = new npm_1.PackageTree(keyword);
+            packageTree = new npm_1.PackageTree(keyword, version);
             packageFilesTree = vscode.window.createTreeView('views.npm.package.list', { treeDataProvider: packageTree });
         }
-        packageFilesTree.description = keyword;
+        packageFilesTree.title = keyword;
+        packageFilesTree.description = '@' + version;
     }
 });
 exports.view = view;
@@ -45,6 +46,15 @@ const viewfile = (url) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.viewfile = viewfile;
 const selectVersion = () => {
+    if (packageTree && !packageTree.isLoading && packageTree.versionList.length > 0) {
+        vscode.window.showQuickPick(packageTree.versionList, {
+            title: 'switch versions',
+            placeHolder: 'search package versions'
+        }).then(res => {
+            packageTree.refresh(packageTree.keyword, res);
+            packageFilesTree.description = '@' + res;
+        });
+    }
 };
 exports.selectVersion = selectVersion;
 //# sourceMappingURL=view.js.map

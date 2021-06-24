@@ -1,10 +1,8 @@
 
 import * as vscode from "vscode";
-import { SearchNpmPackageModel, searchNpmPackage, getPakageDirectory, PakageDirectoryModel } from "../apis";
+import { SearchNpmPackageModel, searchNpmPackage, getPackageDirectory, PakageDirectoryModel, getPackageVersions } from "../apis";
 
 export class NpmSearchTreeItem extends vscode.TreeItem {
-
-
     constructor(
         public readonly label: string,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
@@ -38,7 +36,6 @@ export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem>
             return [];
         }
         return searchNpmPackage(this.keyword).then((res: SearchNpmPackageModel[]) => {
-            console.log(res);
             return res.map((item: SearchNpmPackageModel) => {
                 let treeItem = new NpmSearchTreeItem(
                     item.name,
@@ -46,7 +43,7 @@ export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem>
                     {
                         title: 'view package',
                         command: 'npm.packageview.view',
-                        arguments: [item.name + '@' + item.version]
+                        arguments: [item.name, item.version]
                     }
                 );
                 treeItem.description = item.description;
@@ -62,14 +59,29 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     readonly onDidChangeTreeData: vscode.Event<NpmSearchTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
     private readonly basepath = 'https://cdn.jsdelivr.net/npm/';
+    public isLoading = false;
+    public versionList: string[];
 
-    constructor(private keyword: string) {
+    constructor(public keyword: string, public version: string) {
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+        this._getVersion();
     }
 
-    refresh(keyword: string) {
-        this.keyword = keyword;
+    _getVersion() {
+        getPackageVersions(this.keyword).then(res => {
+            this.versionList = res;
+        });
+    }
+
+    refresh(keyword: string, version: string) {
+        this.version = version;
+        if (this.keyword !== keyword) {
+            this.keyword = keyword;
+            this._getVersion();
+        } else {
+            this.keyword = keyword;
+        }
         this._onDidChangeTreeData.fire();
     }
 
@@ -103,8 +115,11 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
         if (element) {
             return element.element.files.map(item => this.createTreeItem(item, element.filepath));
         } else {
-            return getPakageDirectory(this.keyword).then((res: PakageDirectoryModel[]) => {
+            this.isLoading = true;
+            return getPackageDirectory(this.keyword + '@' + this.version).then((res: PakageDirectoryModel[]) => {
                 return res.map((item: any) => this.createTreeItem(item, this.basepath + this.keyword));
+            }).finally(() => {
+                this.isLoading = false;
             });
         }
     }

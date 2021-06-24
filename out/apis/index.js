@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPakageDirectory = exports.searchNpmPackage = void 0;
+exports.getPackageVersions = exports.getPackageDirectory = exports.searchNpmPackage = void 0;
 const utils_1 = require("../utils");
 const jsdelivrUrl = 'https://data.jsdelivr.com/v1/package/npm/';
 const npmUrl = 'https://www.npmjs.com';
@@ -23,9 +23,14 @@ const searchNpmPackage = (keyword) => __awaiter(void 0, void 0, void 0, function
     return JSON.parse(res).objects.map((item) => item.package);
 });
 exports.searchNpmPackage = searchNpmPackage;
-const getPakageDirectory = (keyword) => __awaiter(void 0, void 0, void 0, function* () {
+const getPackageDirectory = (keyword) => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield utils_1.httpsGet({ url: jsdelivrUrl + keyword });
     return JSON.parse(res).files;
 });
-exports.getPakageDirectory = getPakageDirectory;
+exports.getPackageDirectory = getPackageDirectory;
+const getPackageVersions = (keyword) => __awaiter(void 0, void 0, void 0, function* () {
+    const res = yield utils_1.httpsGet({ url: jsdelivrUrl + keyword });
+    return JSON.parse(res).versions;
+});
+exports.getPackageVersions = getPackageVersions;
 //# sourceMappingURL=index.js.map

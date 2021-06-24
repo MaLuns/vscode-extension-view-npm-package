@@ -33,12 +33,11 @@ class NpmSearchTree {
             return [];
         }
         return apis_1.searchNpmPackage(this.keyword).then((res) => {
-            console.log(res);
             return res.map((item) => {
                 let treeItem = new NpmSearchTreeItem(item.name, vscode.TreeItemCollapsibleState.None, {
                     title: 'view package',
                     command: 'npm.packageview.view',
-                    arguments: [item.name + '@' + item.version]
+                    arguments: [item.name, item.version]
                 });
                 treeItem.description = item.description;
                 treeItem.iconPath = new vscode.ThemeIcon('package');
@@ -49,16 +48,31 @@ class NpmSearchTree {
 }
 exports.NpmSearchTree = NpmSearchTree;
 class PackageTree {
-    constructor(keyword) {
+    constructor(keyword, version) {
         this.keyword = keyword;
+        this.version = version;
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
         this.basepath = 'https://cdn.jsdelivr.net/npm/';
+        this.isLoading = false;
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
+        this._getVersion();
     }
-    refresh(keyword) {
-        this.keyword = keyword;
+    _getVersion() {
+        apis_1.getPackageVersions(this.keyword).then(res => {
+            this.versionList = res;
+        });
+    }
+    refresh(keyword, version) {
+        this.version = version;
+        if (this.keyword !== keyword) {
+            this.keyword = keyword;
+            this._getVersion();
+        }
+        else {
+            this.keyword = keyword;
+        }
         this._onDidChangeTreeData.fire();
     }
     getTreeItem(element) {
@@ -86,8 +100,11 @@ class PackageTree {
             return element.element.files.map(item => this.createTreeItem(item, element.filepath));
         }
         else {
-            return apis_1.getPakageDirectory(this.keyword).then((res) => {
+            this.isLoading = true;
+            return apis_1.getPackageDirectory(this.keyword + '@' + this.version).then((res) => {
                 return res.map((item) => this.createTreeItem(item, this.basepath + this.keyword));
+            }).finally(() => {
+                this.isLoading = false;
             });
         }
     }
