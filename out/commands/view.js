@@ -51,8 +51,10 @@ const selectVersion = () => {
             title: 'switch versions',
             placeHolder: 'search package versions'
         }).then(res => {
-            packageTree.refresh(packageTree.keyword, res);
-            packageFilesTree.description = '@' + res;
+            if (res) {
+                packageTree.refresh(packageTree.keyword, res);
+                packageFilesTree.description = '@' + res;
+            }
         });
     }
 };

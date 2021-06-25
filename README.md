@@ -1,1 +1,2 @@
-# view-npm-package
+## view-npm-package
+![demo](./images/demo.gif)
