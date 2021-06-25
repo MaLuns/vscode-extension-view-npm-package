@@ -2,7 +2,7 @@ import { Uri, window, ProgressLocation } from "vscode";
 import * as https from 'https';
 
 /**
- * 下载文件
+ * 
  * @param uri 
  * @returns 
  */

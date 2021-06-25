@@ -17,8 +17,8 @@ let npmSearchTreeView;
 const search = () => __awaiter(void 0, void 0, void 0, function* () {
     let keyword = yield vscode.window.showInputBox({
         ignoreFocusOut: true,
-        placeHolder: '请输入npm包名',
-        prompt: '请输入npm包名',
+        placeHolder: 'please input npm package name',
+        prompt: 'please input npm package name',
     });
     if (keyword) {
         if (npmSearchTree) {

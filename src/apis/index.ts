@@ -1,5 +1,7 @@
 import { httpsGet } from "../utils";
 
+
+export const jsdelivrFileUrl = 'https://cdn.jsdelivr.net/npm/';
 const jsdelivrUrl = 'https://data.jsdelivr.com/v1/package/npm/';
 const npmUrl = 'https://www.npmjs.com';
 

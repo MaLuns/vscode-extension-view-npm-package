@@ -19,7 +19,6 @@ class NpmSearchTree {
         this.keyword = keyword;
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
-        this.url = 'https://www.npmjs.com/search?q=';
     }
     refresh(keyword) {
         this.keyword = keyword;
@@ -53,7 +52,6 @@ class PackageTree {
         this.version = version;
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
-        this.basepath = 'https://cdn.jsdelivr.net/npm/';
         this.isLoading = false;
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -102,7 +100,7 @@ class PackageTree {
         else {
             this.isLoading = true;
             return apis_1.getPackageDirectory(this.keyword + '@' + this.version).then((res) => {
-                return res.map((item) => this.createTreeItem(item, this.basepath + this.keyword));
+                return res.map((item) => this.createTreeItem(item, apis_1.jsdelivrFileUrl + this.keyword));
             }).finally(() => {
                 this.isLoading = false;
             });

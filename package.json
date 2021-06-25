@@ -1,7 +1,7 @@
 {
 	"name": "npm-package-view",
 	"displayName": "view npm package",
-	"description": "view npm package",
+	"description": "view npm package in vscode",
 	"version": "0.0.2",
 	"repository": {
 		"type": "git",
@@ -11,6 +11,12 @@
 	"author": {
 		"name": "白云苍狗"
 	},
+	"keywords": [
+		"npm",
+		"package",
+		"view package",
+		"view node package"
+	],
 	"engines": {
 		"vscode": "^1.46.0"
 	},

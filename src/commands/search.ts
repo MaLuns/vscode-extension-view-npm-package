@@ -8,8 +8,8 @@ let npmSearchTreeView: vscode.TreeView<NpmSearchTreeItem>;
 export const search = async () => {
     let keyword = await vscode.window.showInputBox({
         ignoreFocusOut: true,
-        placeHolder: '请输入npm包名',
-        prompt: '请输入npm包名',
+        placeHolder: 'please input npm package name',
+        prompt: 'please input npm package name',
     });
     if (keyword) {
         if (npmSearchTree) {

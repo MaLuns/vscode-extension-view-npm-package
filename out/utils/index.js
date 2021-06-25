@@ -4,7 +4,7 @@ exports.httpsGet = exports.downFile = void 0;
 const vscode_1 = require("vscode");
 const https = require("https");
 /**
- * 下载文件
+ *
  * @param uri
  * @returns
  */

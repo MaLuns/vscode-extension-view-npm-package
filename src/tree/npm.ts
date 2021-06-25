@@ -1,6 +1,6 @@
 
 import * as vscode from "vscode";
-import { SearchNpmPackageModel, searchNpmPackage, getPackageDirectory, PakageDirectoryModel, getPackageVersions } from "../apis";
+import { SearchNpmPackageModel, searchNpmPackage, getPackageDirectory, PakageDirectoryModel, getPackageVersions, jsdelivrFileUrl } from "../apis";
 
 export class NpmSearchTreeItem extends vscode.TreeItem {
     constructor(
@@ -17,8 +17,6 @@ export class NpmSearchTreeItem extends vscode.TreeItem {
 export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<NpmSearchTreeItem | undefined | void> = new vscode.EventEmitter<NpmSearchTreeItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<NpmSearchTreeItem | undefined | void> = this._onDidChangeTreeData.event;
-
-    readonly url = 'https://www.npmjs.com/search?q=';
 
     constructor(private keyword: string) { }
 
@@ -58,7 +56,6 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<NpmSearchTreeItem | undefined | void> = new vscode.EventEmitter<NpmSearchTreeItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<NpmSearchTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-    private readonly basepath = 'https://cdn.jsdelivr.net/npm/';
     public isLoading = false;
     public versionList: string[];
 
@@ -117,7 +114,7 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
         } else {
             this.isLoading = true;
             return getPackageDirectory(this.keyword + '@' + this.version).then((res: PakageDirectoryModel[]) => {
-                return res.map((item: any) => this.createTreeItem(item, this.basepath + this.keyword));
+                return res.map((item: any) => this.createTreeItem(item, jsdelivrFileUrl + this.keyword));
             }).finally(() => {
                 this.isLoading = false;
             });
