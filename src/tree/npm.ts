@@ -1,5 +1,8 @@
 
 import * as vscode from "vscode";
+import * as nodePath from 'path';
+import fileIcon from './file';
+
 import { SearchNpmPackageModel, searchNpmPackage, getPackageDirectory, PakageDirectoryModel, getPackageVersions, jsdelivrFileUrl } from "../apis";
 
 export class NpmSearchTreeItem extends vscode.TreeItem {
@@ -91,16 +94,21 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
             item.name,
             item.type === 'directory' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
         );
-
         treeItem.element = item;
         treeItem.filepath = path ? path + '/' + item.name : item.name;
-        treeItem.iconPath = item.type === 'directory' ? new vscode.ThemeIcon('file-directory') : new vscode.ThemeIcon('file');
         if (item.type === 'file') {
             treeItem.command = {
                 title: 'view file',
                 command: 'npm.packageview.viewfile',
                 arguments: [path ? path + '/' + item.name : item.name]
             };
+            let key = item.name.substr(item.name.lastIndexOf('.') + 1);
+            let icon = fileIcon[key] ?
+                nodePath.join(__dirname, '../../icons/files/' + fileIcon[key] + '.svg')
+                : new vscode.ThemeIcon('file');
+            treeItem.iconPath = icon;
+        } else {
+            treeItem.iconPath = new vscode.ThemeIcon('folder');
         }
         return treeItem;
     }
