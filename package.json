@@ -36,7 +36,7 @@
 				"icon": "$(filter)"
 			},
 			{
-				"command": "npm.packageview.selectVersion",
+				"command": "npm.packageview.switchVersion",
 				"title": "select package version",
 				"icon": "$(list-filter)"
 			}
@@ -48,7 +48,7 @@
 					"when": "false"
 				},
 				{
-					"command": "npm.packageview.selectVersion",
+					"command": "npm.packageview.switchVersion",
 					"when": "false"
 				}
 			],
@@ -59,7 +59,7 @@
 					"group": "navigation"
 				},
 				{
-					"command": "npm.packageview.selectVersion",
+					"command": "npm.packageview.switchVersion",
 					"when": "view == views.npm.package.list",
 					"group": "navigation"
 				}

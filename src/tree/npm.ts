@@ -99,7 +99,7 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
         if (item.type === 'file') {
             treeItem.command = {
                 title: 'view file',
-                command: 'npm.packageview.viewfile',
+                command: 'npm.packageview.previewFile',
                 arguments: [path ? path + '/' + item.name : item.name]
             };
             let key = item.name.substr(item.name.lastIndexOf('.') + 1);

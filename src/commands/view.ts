@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import path = require('path');
 import { NpmSearchTreeItem, PackageTree } from "../tree/npm";
 
 let packageTree: PackageTree;
@@ -22,20 +23,30 @@ export const view = async (keyword: string, version: string) => {
 };
 
 /**
- * 
+ * The file preview
  * @param url 
  */
-export const viewfile = async (url: string) => {
-    let uri = vscode.Uri.parse(url).with({ scheme: 'npmpackage' });
-    vscode.workspace.openTextDocument(uri).then(doc => {
-        vscode.window.showTextDocument(doc, {
-            preview: false
+export const previewFile = async (url: string) => {
+    let ext = path.extname(url);
+    if ([".png", ".jpeg", ".jpg", ".gif", ".ico", ".tif", ".tiff", ".psd", ".psb", ".ami", ".apx", ".bmp", ".bpg", ".brk", ".cur", ".dds", ".dng", ".exr", ".fpx", ".gbr", ".img",].includes(ext)) {
+        let uri = vscode.Uri.parse(url).with({ scheme: 'https' });
+        vscode.commands.executeCommand("vscode.open", uri, {
+            preview: false,
         });
-    });
+    } else {
+        let uri = vscode.Uri.parse(url).with({ scheme: 'npmpackage' });
+        vscode.workspace.openTextDocument(uri).then(doc => {
+            vscode.window.showTextDocument(doc, {
+                preview: false
+            });
+        });
+    }
 };
 
-
-export const selectVersion = () => {
+/**
+ * Switch version
+ */
+export const switchVersion = () => {
     if (packageTree && !packageTree.isLoading && packageTree.versionList.length > 0) {
         vscode.window.showQuickPick(packageTree.versionList, {
             title: 'switch versions',
