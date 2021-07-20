@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.7 
+- feat: Add Change Log
+
 ## 0.0.6
 - feat: Add preview img
   
