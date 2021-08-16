@@ -2,7 +2,7 @@
 	"name": "npm-package-view",
 	"displayName": "view npm package",
 	"description": "view npm package in vscode",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MaLuns/vscode-extension-view-npm-package"
