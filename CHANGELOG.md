@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.9
+- fix: The file cannot be found after the version switch
+
 ## 0.0.8
 ## 0.0.7 
 - feat: Add Change Log

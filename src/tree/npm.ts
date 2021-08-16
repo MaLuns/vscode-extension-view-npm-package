@@ -118,11 +118,11 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
             return [];
         }
         if (element) {
-            return element.element.files.map(item => this.createTreeItem(item, element.filepath));
+            return element.element.files.map((item: any) => this.createTreeItem(item, element.filepath));
         } else {
             this.isLoading = true;
             return getPackageDirectory(this.keyword + '@' + this.version).then((res: PakageDirectoryModel[]) => {
-                return res.map((item: any) => this.createTreeItem(item, jsdelivrFileUrl + this.keyword));
+                return res.map((item: any) => this.createTreeItem(item, `${jsdelivrFileUrl}${this.keyword}${this.version ? '@' + this.version : ''}`));
             }).finally(() => {
                 this.isLoading = false;
             });
