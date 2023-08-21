@@ -7,11 +7,14 @@ import * as https from 'https';
  * @returns 
  */
 export const downFile = (uri: Uri) => {
-    let url = `https://${uri.authority}${uri.path}`;
+    const paths = uri.path.split('/');
+    const fileName = paths.pop();
+    const url = `https://${uri.authority}${paths.join('/')}`;
+
     return window.withProgress({
-        title: "downloading: " + uri.path.substr(uri.path.lastIndexOf('/') + 1),
+        title: "downloading: " + fileName,
         location: ProgressLocation.Notification,
-        cancellable: true
+        cancellable: true,
     }, (progressReporter) => {
         return new Promise((resolve) => {
             https.get(url, (res: any) => {
@@ -44,7 +47,7 @@ export const downFile = (uri: Uri) => {
  * @param param
  * @returns 
  */
-export const httpsGet = ({ url, header }: { url: string, header?: any }): Promise<string | undefined> => {
+export const httpsGet = ({ url, header }: { url: string, header?: any; }): Promise<string | undefined> => {
     return new Promise((resolve) => {
         https.get(url, {
             headers: {

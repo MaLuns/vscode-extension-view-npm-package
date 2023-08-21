@@ -1,9 +1,9 @@
 
 import * as vscode from "vscode";
 import * as nodePath from 'path';
+import orderBy from 'lodash/orderBy';
 import fileIcon from './file';
-
-import { SearchNpmPackageModel, searchNpmPackage, getPackageDirectory, PakageDirectoryModel, getPackageVersions, jsdelivrFileUrl } from "../apis";
+import { SearchNpmPackageModel, searchNpmPackage, getPackageDirectory, getPackageVersions } from "../apis";
 
 export class NpmSearchTreeItem extends vscode.TreeItem {
     constructor(
@@ -38,7 +38,7 @@ export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem>
         }
         return searchNpmPackage(this.keyword).then((res: SearchNpmPackageModel[]) => {
             return res.map((item: SearchNpmPackageModel) => {
-                let treeItem = new NpmSearchTreeItem(
+                const treeItem = new NpmSearchTreeItem(
                     item.name,
                     vscode.TreeItemCollapsibleState.None,
                     {
@@ -60,25 +60,60 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     readonly onDidChangeTreeData: vscode.Event<NpmSearchTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
     public isLoading = false;
-    public versionList: string[];
+    public versionList: { v: string, d: number; }[];
 
     constructor(public keyword: string, public version: string) {
         this._onDidChangeTreeData = new vscode.EventEmitter();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
-        this._getVersion();
+        this._getVersion(version);
     }
 
-    _getVersion() {
-        getPackageVersions(this.keyword).then(res => {
-            this.versionList = res;
+    _getVersion(version: string) {
+        getPackageVersions(this.keyword, version).then(res => {
+            this.versionList =
+                orderBy(
+                    Object.keys(res.versionsDownloads).map(v => ({ v: v, d: res.versionsDownloads[v] })),
+                    ['v'],
+                    ['desc']
+                );
         });
+    }
+
+    _getSelectedFolderSubTree(files: any) {
+        return Object.keys(files).reduce((list, filename) => {
+            const paths = filename.split("/").filter((i) => i !== "");
+            const isFolder = paths.length > 1;
+            if (isFolder) {
+                paths.reduce((acc, p, i) => {
+                    acc[p] = {
+                        type: "Folder",
+                        label: p,
+                        ...(acc[p] || {}),
+                    };
+
+                    if (i === paths.length - 1) {
+                        acc[p] = { ...acc[p], ...files[filename] };
+                    } else {
+                        acc[p].childen = { ...(acc[p].childen || {}) };
+                    }
+
+                    return acc[p].childen;
+                }, list);
+            } else {
+                list[paths[0]] = {
+                    label: paths[0],
+                    ...files[filename],
+                };
+            }
+            return list;
+        }, {});
     }
 
     refresh(keyword: string, version: string) {
         this.version = version;
         if (this.keyword !== keyword) {
             this.keyword = keyword;
-            this._getVersion();
+            this._getVersion(version);
         } else {
             this.keyword = keyword;
         }
@@ -89,26 +124,25 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
         return element;
     }
 
-    createTreeItem(item: any, path?: string) {
-        let treeItem = new NpmSearchTreeItem(
-            item.name,
-            item.type === 'directory' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
-        );
+    createTreeItem(item: any) {
+        const treeItem = new NpmSearchTreeItem(item.label, item.type === 'Folder' ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
         treeItem.element = item;
-        treeItem.filepath = path ? path + '/' + item.name : item.name;
-        if (item.type === 'file') {
+        if (item.type !== 'Folder') {
             treeItem.command = {
                 title: 'view file',
                 command: 'npm.packageview.previewFile',
-                arguments: [path ? path + '/' + item.name : item.name]
+                arguments: [item.hex, item.label, item.contentType]
             };
-            let key = item.name.substr(item.name.lastIndexOf('.') + 1);
-            let icon = fileIcon[key] ?
-                nodePath.join(__dirname, '../../icons/files/' + fileIcon[key] + '.svg')
-                : new vscode.ThemeIcon('file');
-            treeItem.iconPath = icon;
+            const keys = (<string[]>item.label.split('.')).reverse();
+            let iconName = fileIcon.fileNames[item.label.toLocaleLowerCase()];
+            if (!iconName) {
+                iconName = keys.length > 2 ? fileIcon.fileExtensions[`${keys[1]}.${keys[0]}`] || fileIcon.fileExtensions[keys[0]] : fileIcon.fileExtensions[keys[0]];
+            }
+            iconName = iconName || 'file';
+            treeItem.iconPath = nodePath.join(__dirname, '../../icons/files/' + iconName + '.svg');
         } else {
-            treeItem.iconPath = new vscode.ThemeIcon('folder');
+            const iconName = fileIcon.folderNames[item.label] || 'folder';
+            treeItem.iconPath = nodePath.join(__dirname, '../../icons/files/' + iconName + '.svg');
         }
         return treeItem;
     }
@@ -118,11 +152,22 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
             return [];
         }
         if (element) {
-            return element.element.files.map((item: any) => this.createTreeItem(item, element.filepath));
+            const datas = orderBy(
+                Object.keys(element.element.childen).map(currentPath => element.element.childen[currentPath]),
+                ['type', 'label'],
+                ['desc', 'asc'],
+            );
+            return datas.map(this.createTreeItem.bind(this)) as NpmSearchTreeItem[];
         } else {
             this.isLoading = true;
-            return getPackageDirectory(this.keyword + '@' + this.version).then((res: PakageDirectoryModel[]) => {
-                return res.map((item: any) => this.createTreeItem(item, `${jsdelivrFileUrl}${this.keyword}${this.version ? '@' + this.version : ''}`));
+            return getPackageDirectory(this.keyword, this.version).then((res: any) => {
+                const files = this._getSelectedFolderSubTree(res.files);
+                const datas = orderBy(
+                    Object.keys(files).map(currentPath => files[currentPath]),
+                    ['type', 'label'],
+                    ['desc', 'asc'],
+                );
+                return datas.map(this.createTreeItem.bind(this)) as NpmSearchTreeItem[];
             }).finally(() => {
                 this.isLoading = false;
             });
