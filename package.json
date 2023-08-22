@@ -89,7 +89,7 @@
 		"viewsWelcome": [
 			{
 				"view": "views.npm.search.list",
-				"contents": "Please click the filter icon in the upper right corner to query the NPM package"
+				"contents": "Please click the filter icon in the upper right corner to query the NPM package.\n[Search](command:npm.packageview.search)"
 			},
 			{
 				"view": "views.npm.package.list",

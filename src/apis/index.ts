@@ -1,6 +1,6 @@
 import { httpsGet } from "../utils";
 
-const npmUrl = 'https://www.npmjs.com';
+export const npmUrl = 'https://www.npmjs.com';
 
 export const searchNpmPackage = async (keyword: string): Promise<SearchNpmPackageModel[]> => {
     const res = await httpsGet({

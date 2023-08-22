@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import path = require('path');
 import { NpmSearchTreeItem, PackageTree } from "../tree/npm";
+import { npmUrl } from '../apis';
 
 let packageTree: PackageTree;
 let packageFilesTree: vscode.TreeView<NpmSearchTreeItem>;
@@ -26,7 +27,7 @@ export const view = async (keyword: string, version: string) => {
  * The file preview
  * @param url 
  */
-export const previewFile = async (url: string, filename: string) => {
+export const previewFile = async (url: string, packageName: string, filename: string) => {
     let ext = path.extname(url);
     if ([".png", ".jpeg", ".jpg", ".gif", ".ico", ".tif", ".tiff", ".psd", ".psb", ".ami", ".apx", ".bmp", ".bpg", ".brk", ".cur", ".dds", ".dng", ".exr", ".fpx", ".gbr", ".img",].includes(ext)) {
         let uri = vscode.Uri.parse(url).with({ scheme: 'https' });
@@ -34,7 +35,7 @@ export const previewFile = async (url: string, filename: string) => {
             preview: false,
         });
     } else {
-        let uri = vscode.Uri.parse(`https://www.npmjs.com/package/vue/file/${url}/${filename}`).with({ scheme: 'npmpackage' });
+        let uri = vscode.Uri.parse(`${npmUrl}/package/${packageName}/file/${url}/[${packageName}] ${filename}`).with({ scheme: 'npmpackage' });
         vscode.workspace.openTextDocument(uri).then(doc => {
             vscode.window.showTextDocument(doc, {
                 preview: false

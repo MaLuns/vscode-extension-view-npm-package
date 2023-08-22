@@ -111,11 +111,9 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
 
     refresh(keyword: string, version: string) {
         this.version = version;
+        this.keyword = keyword;
         if (this.keyword !== keyword) {
-            this.keyword = keyword;
             this._getVersion(version);
-        } else {
-            this.keyword = keyword;
         }
         this._onDidChangeTreeData.fire();
     }
@@ -131,7 +129,7 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
             treeItem.command = {
                 title: 'view file',
                 command: 'npm.packageview.previewFile',
-                arguments: [item.hex, item.label, item.contentType]
+                arguments: [item.hex, this.keyword, item.label, item.contentType]
             };
             const keys = (<string[]>item.label.split('.')).reverse();
             let iconName = fileIcon.fileNames[item.label.toLocaleLowerCase()];
