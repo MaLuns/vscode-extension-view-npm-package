@@ -2,9 +2,9 @@ import { httpsGet } from "../utils";
 
 export const npmUrl = 'https://www.npmjs.com';
 
-export const searchNpmPackage = async (keyword: string): Promise<SearchNpmPackageModel[]> => {
+export const searchNpmPackage = async (keyword: string, page: number = 1, perPage: number = 20): Promise<SearchNpmPackageModel[]> => {
     const res = await httpsGet({
-        url: `${npmUrl}/search?q=${keyword}`,
+        url: `${npmUrl}/search?q=${keyword}&page=${page}&perPage=${perPage}`,
         header: {
             "x-spiferack": "1"
         }

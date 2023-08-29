@@ -21,10 +21,21 @@ export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem>
     private _onDidChangeTreeData: vscode.EventEmitter<NpmSearchTreeItem | undefined | void> = new vscode.EventEmitter<NpmSearchTreeItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<NpmSearchTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
-    constructor(private keyword: string) { }
+    private page: number = 0;
+    private data: SearchNpmPackageModel[] = [];
 
-    refresh(keyword: string): void {
+    constructor(private keyword: string) {
+        vscode.commands.registerCommand('npm.packageview.loadmore', () => {
+            this.refresh(this.keyword, this.page);
+        });
+    }
+
+    refresh(keyword: string, page: number = 0): void {
         this.keyword = keyword;
+        this.page = page;
+        if (page === 0) {
+            this.data = [];
+        }
         this._onDidChangeTreeData.fire();
     }
 
@@ -36,8 +47,9 @@ export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem>
         if (!this.keyword) {
             return [];
         }
-        return searchNpmPackage(this.keyword).then((res: SearchNpmPackageModel[]) => {
-            return res.map((item: SearchNpmPackageModel) => {
+        return searchNpmPackage(this.keyword, this.page++).then((res: SearchNpmPackageModel[]) => {
+            this.data.push(...res);
+            const treeItems = this.data.map((item: SearchNpmPackageModel) => {
                 const treeItem = new NpmSearchTreeItem(
                     item.name,
                     vscode.TreeItemCollapsibleState.None,
@@ -48,9 +60,21 @@ export class NpmSearchTree implements vscode.TreeDataProvider<NpmSearchTreeItem>
                     }
                 );
                 treeItem.description = item.description;
-                treeItem.iconPath = new vscode.ThemeIcon('package');
+                treeItem.iconPath = vscode.Uri.parse(`https://www.npmjs.com${item.publisher.avatars.small}`);//new vscode.ThemeIcon('package');
                 return treeItem;
             });
+
+            const load = new NpmSearchTreeItem(
+                'load more',
+                vscode.TreeItemCollapsibleState.None,
+                {
+                    title: 'view package',
+                    command: 'npm.packageview.loadmore',
+                }
+            );
+            load.iconPath = new vscode.ThemeIcon('more');
+            treeItems.push(load);
+            return treeItems;
         });
     }
 }
@@ -69,13 +93,13 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     }
 
     _getVersion(version: string) {
+        this.versionList = [];
         getPackageVersions(this.keyword, version).then(res => {
-            this.versionList =
-                orderBy(
-                    Object.keys(res.versionsDownloads).map(v => ({ v: v, d: res.versionsDownloads[v] })),
-                    ['v'],
-                    ['desc']
-                );
+            this.versionList = orderBy(
+                Object.keys(res.versionsDownloads).map(v => ({ v: v, d: res.versionsDownloads[v] })),
+                ['v'],
+                ['desc']
+            );
         });
     }
 
@@ -112,9 +136,7 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     refresh(keyword: string, version: string) {
         this.version = version;
         this.keyword = keyword;
-        if (this.keyword !== keyword) {
-            this._getVersion(version);
-        }
+        this._getVersion(version);
         this._onDidChangeTreeData.fire();
     }
 
