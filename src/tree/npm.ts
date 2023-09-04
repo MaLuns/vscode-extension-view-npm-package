@@ -84,7 +84,7 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     readonly onDidChangeTreeData: vscode.Event<NpmSearchTreeItem | undefined | void> = this._onDidChangeTreeData.event;
 
     public isLoading = false;
-    public versionList: { v: string, d: number; }[];
+    public versionList: any[];
 
     constructor(public keyword: string, public version: string) {
         this._onDidChangeTreeData = new vscode.EventEmitter();
@@ -95,11 +95,12 @@ export class PackageTree implements vscode.TreeDataProvider<NpmSearchTreeItem> {
     _getVersion(version: string) {
         this.versionList = [];
         getPackageVersions(this.keyword, version).then(res => {
-            this.versionList = orderBy(
+            this.versionList = res.packument.versions;
+            /* this.versionList = orderBy(
                 Object.keys(res.versionsDownloads).map(v => ({ v: v, d: res.versionsDownloads[v] })),
                 ['v'],
                 ['desc']
-            );
+            ); */
         });
     }
 

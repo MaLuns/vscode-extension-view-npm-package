@@ -17,7 +17,7 @@ export const getPackageDirectory = async (name: string, version: string): Promis
     return JSON.parse(res);
 };
 
-export const getPackageVersions = async (name: string, version: string): Promise<{ versionsDownloads: Record<string, number>; }> => {
+export const getPackageVersions = async (name: string, version: string): Promise<any> => {
     const res = await httpsGet({
         url: `${npmUrl}/package/${name}/v/${version}`,
         header: {

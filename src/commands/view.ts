@@ -51,8 +51,8 @@ export const switchVersion = () => {
     if (packageTree && !packageTree.isLoading && packageTree.versionList.length > 0) {
         vscode.window.showQuickPick(packageTree.versionList.map(item => {
             return {
-                label: item.v,
-                description: `Downloads (Last 7 Days) (${item.d})`
+                label: item.version,
+                description: `(${item.date.rel})`
             };
         }), {
             title: 'switch versions',
