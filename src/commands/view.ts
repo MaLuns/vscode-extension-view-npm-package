@@ -28,12 +28,10 @@ export const view = async (keyword: string, version: string) => {
  * @param url 
  */
 export const previewFile = async (url: string, packageName: string, filename: string) => {
-    let ext = path.extname(url);
+    let ext = path.extname(filename);
     if ([".png", ".jpeg", ".jpg", ".gif", ".ico", ".tif", ".tiff", ".psd", ".psb", ".ami", ".apx", ".bmp", ".bpg", ".brk", ".cur", ".dds", ".dng", ".exr", ".fpx", ".gbr", ".img",].includes(ext)) {
-        let uri = vscode.Uri.parse(url).with({ scheme: 'https' });
-        vscode.commands.executeCommand("vscode.open", uri, {
-            preview: false,
-        });
+        let uri = vscode.Uri.parse(`${npmUrl}/package/${packageName}/file/${url}`).with({ scheme: 'https' });
+        vscode.commands.executeCommand('vscode.openWith', uri, 'imagePreview.previewEditor');
     } else {
         let uri = vscode.Uri.parse(`${npmUrl}/package/${packageName}/file/${url}/[${packageName}] ${filename}`).with({ scheme: 'npmpackage' });
         vscode.workspace.openTextDocument(uri).then(doc => {
